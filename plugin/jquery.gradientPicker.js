@@ -260,12 +260,14 @@
 		var $rmEl = $("<div class='gradientPicker-close'></div>");
 		this.$el.append($rmEl);
 
-		this.colorChanged = bind(this.colorChanged, this);
 		this.removeClicked = bind(this.removeClicked, this);
+
+		this.colorChanged = bind(this.colorChanged, this);
+		var colorChangeHandler = e => {
+			this.colorChanged(e.value);
+		};
 		$cpicker.kendoColorPicker({
-			change: function (e) {
-				this.colorChanged(e.value);
-			},
+			change: colorChangeHandler,
 		});
 		this.$cpicker = $cpicker;
 		this.opts = opts;
@@ -279,7 +281,10 @@
 			this.visible = true;
 			this.listener = listener;
 			this.$el.css("visibility", "visible");
-			this.$cpicker.value(color);
+
+			var cp = this.$cpicker.data("kendoColorPicker");
+			cp.value(color);
+
 			if (this.opts.orientation === "horizontal") {
 				this.$el.css("left", position.left);
 			} else {
