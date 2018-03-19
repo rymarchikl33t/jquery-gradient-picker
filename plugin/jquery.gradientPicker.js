@@ -1,18 +1,18 @@
 /**
 @author Matt Crinklaw-Vogt (tantaman)
 */
-(function( $ ) {
+(function ($) {
 	if (!$.event.special.destroyed) {
 		$.event.special.destroyed = {
-		    remove: function(o) {
-		    	if (o.handler) {
-		    		o.handler();
-		    	}
-		    }
+			remove: function (o) {
+				if (o.handler) {
+					o.handler();
+				}
+			}
 		}
 	}
 
-	function ctrlPtComparator(l,r) {
+	function ctrlPtComparator(l, r) {
 		return l.position - r.position;
 	}
 
@@ -20,7 +20,7 @@
 		if (typeof fn.bind === "function") {
 			return fn.bind(ctx);
 		} else {
-			return function() {
+			return function () {
 				fn.apply(ctx, arguments);
 			}
 		}
@@ -72,24 +72,24 @@
 	}
 
 	GradientSelection.prototype = {
-		docClicked: function() {
+		docClicked: function () {
 			this.ctrlPtConfig.hide();
 		},
 
-		createCtrlPt: function(ctrlPtSetup) {
+		createCtrlPt: function (ctrlPtSetup) {
 			return new ControlPoint(this.$ctrlPtContainer, ctrlPtSetup, this.opts.orientation, this, this.ctrlPtConfig)
 		},
 
-		destroyed: function() {
+		destroyed: function () {
 			$(document).unbind("click", this.docClicked);
 		},
 
-		updateOptions: function(opts) {
+		updateOptions: function (opts) {
 			$.extend(this.opts, opts);
 			this.updatePreview();
 		},
 
-		updatePreview: function() {
+		updatePreview: function () {
 			var result = [];
 			this.controlPoints.sort(ctrlPtComparator);
 			if (this.opts.orientation == "horizontal") {
@@ -115,7 +115,7 @@
 			this.opts.change(result, styles);
 		},
 
-		removeControlPoint: function(ctrlPt) {
+		removeControlPoint: function (ctrlPt) {
 			var cpidx = this.controlPoints.indexOf(ctrlPt);
 
 			if (cpidx != -1) {
@@ -124,12 +124,12 @@
 			}
 		},
 
-		previewClicked: function(e) {
+		previewClicked: function (e) {
 			var offset = $(e.target).offset();
 			var x = e.pageX - offset.left;
 			var y = e.pageY - offset.top;
 
-			var imgData = this.g2d.getImageData(x,y,1,1);
+			var imgData = this.g2d.getImageData(x, y, 1, 1);
 			var colorStr = "rgb(" + imgData.data[0] + "," + imgData.data[1] + "," + imgData.data[2] + ")";
 
 			var cp = this.createCtrlPt({
@@ -141,7 +141,7 @@
 			this.controlPoints.sort(ctrlPtComparator);
 		},
 
-		_generatePreviewStyles: function() {
+		_generatePreviewStyles: function () {
 			//linear-gradient(top, rgb(217,230,163) 86%, rgb(227,249,159) 9%)
 			var str = this.opts.type + "-gradient(" + ((this.opts.type == "linear") ? (this.opts.fillDirection + ", ") : "");
 			var first = true;
@@ -152,7 +152,7 @@
 				} else {
 					first = false;
 				}
-				str += pt.color + " " + ((pt.position*100)|0) + "%";
+				str += pt.color + " " + ((pt.position * 100) | 0) + "%";
 			}
 
 			str = str + ")"
@@ -169,7 +169,7 @@
 
 		if (typeof initialState === "string") {
 			initialState = initialState.split(" ");
-			this.position = parseFloat(initialState[1])/100;
+			this.position = parseFloat(initialState[1]) / 100;
 			this.color = initialState[0];
 		} else {
 			this.position = initialState.position;
@@ -187,7 +187,7 @@
 			var pxTop = ($parentEl.height() - this.$el.outerHeight()) * (this.position);
 			this.$el.css("top", pxTop);
 		}
-		
+
 		this.drag = bind(this.drag, this);
 		this.stop = bind(this.stop, this);
 		this.clicked = bind(this.clicked, this);
@@ -203,31 +203,31 @@
 	}
 
 	ControlPoint.prototype = {
-		drag: function(e, ui) {
+		drag: function (e, ui) {
 			// convert position to a %
 			var left = ui.position.left;
 			this.position = (left / (this.$parentEl.width() - this.outerWidth));
 			this.listener.updatePreview();
 		},
 
-		stop: function(e, ui) {
+		stop: function (e, ui) {
 			this.listener.updatePreview();
 			this.configView.show(this.$el.position(), this.color, this);
 		},
 
-		clicked: function(e) {
+		clicked: function (e) {
 			this.configView.show(this.$el.position(), this.color, this);
 			e.stopPropagation();
 			return false;
 		},
 
-		colorChanged: function(c) {
+		colorChanged: function (c) {
 			this.color = c;
 			this.$el.css("background-color", this.color);
 			this.listener.updatePreview();
 		},
 
-		removeClicked: function() {
+		removeClicked: function () {
 			this.listener.removeControlPoint(this);
 			this.listener.updatePreview();
 		}
@@ -255,7 +255,7 @@
 	}
 
 	ControlPtConfig.prototype = {
-		show: function(position, color, listener) {
+		show: function (position, color, listener) {
 			this.visible = true;
 			this.listener = listener;
 			this.$el.css("visibility", "visible");
@@ -268,49 +268,49 @@
 			}
 			//else {
 			//	this.visible = false;
-				//this.$el.css("visibility", "hidden");
+			//this.$el.css("visibility", "hidden");
 			//}
 		},
 
-		hide: function() {
+		hide: function () {
 			if (this.visible) {
 				this.$el.css("visibility", "hidden");
 				this.visible = false;
 			}
 		},
 
-		colorChanged: function(hsb, hex, rgb) {
+		colorChanged: function (hsb, hex, rgb) {
 			hex = "#" + hex;
 			this.listener.colorChanged(hex);
 			this.$cpicker.css("background-color", hex)
 		},
 
-		removeClicked: function() {
+		removeClicked: function () {
 			this.listener.removeClicked();
 			this.hide();
 		}
 	};
 
 	var methods = {
-		init: function(opts) {
+		init: function (opts) {
 			opts = $.extend({
 				controlPoints: ["#FFF 0%", "#000 100%"],
 				orientation: "horizontal",
 				type: "linear",
 				fillDirection: "left",
 				generateStyles: true,
-				change: function() {}
+				change: function () { }
 			}, opts);
 
-			this.each(function() {
+			this.each(function () {
 				var $this = $(this);
 				var gradSel = new GradientSelection($this, opts);
 				$this.data("gradientPicker-sel", gradSel);
 			});
 		},
 
-		update: function(opts) {
-			this.each(function() {
+		update: function (opts) {
+			this.each(function () {
 				var $this = $(this);
 				var gradSel = $this.data("gradientPicker-sel");
 				if (gradSel != null) {
@@ -320,7 +320,7 @@
 		}
 	};
 
-	$.fn.gradientPicker = function(method, opts) {
+	$.fn.gradientPicker = function (method, opts) {
 		if (typeof method === "string" && method !== "init") {
 			methods[method].call(this, opts);
 		} else {
@@ -328,4 +328,4 @@
 			methods.init.call(this, opts);
 		}
 	};
-})( jQuery );
+})(jQuery);
