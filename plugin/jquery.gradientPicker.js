@@ -26,6 +26,24 @@
 		}
 	}
 
+	function hexToRgb(hex) {
+		// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+			return r + r + g + g + b + b;
+		});
+
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result
+			? {
+				Red: parseInt(result[1], 16),
+				Green: parseInt(result[2], 16),
+				Blue: parseInt(result[3], 16),
+				Alpha: 1,
+			}
+			: null;
+	}
+
 	var browserPrefix = "";
 	var agent = window.navigator.userAgent;
 	if (agent.indexOf('WebKit') >= 0)
@@ -99,7 +117,7 @@
 					grad.addColorStop(pt.position, pt.color);
 					result.push({
 						position: pt.position,
-						color: pt.color
+						color: hexToRgb(pt.color)
 					});
 				}
 			} else {
@@ -244,8 +262,10 @@
 
 		this.colorChanged = bind(this.colorChanged, this);
 		this.removeClicked = bind(this.removeClicked, this);
-		$cpicker.ColorPicker({
-			onChange: this.colorChanged
+		$cpicker.kendoColorPicker({
+			change: function (e) {
+				this.colorChanged(e.value);
+			},
 		});
 		this.$cpicker = $cpicker;
 		this.opts = opts;
@@ -259,8 +279,7 @@
 			this.visible = true;
 			this.listener = listener;
 			this.$el.css("visibility", "visible");
-			this.$cpicker.ColorPickerSetColor(color);
-			this.$cpicker.css("background-color", color);
+			this.$cpicker.value(color);
 			if (this.opts.orientation === "horizontal") {
 				this.$el.css("left", position.left);
 			} else {
@@ -279,10 +298,8 @@
 			}
 		},
 
-		colorChanged: function (hsb, hex, rgb) {
-			hex = "#" + hex;
+		colorChanged: function (hex) {
 			this.listener.colorChanged(hex);
-			this.$cpicker.css("background-color", hex)
 		},
 
 		removeClicked: function () {
