@@ -55,11 +55,11 @@
 
 		this.updatePreview = bind(this.updatePreview, this);
 		this.controlPoints = [];
-        this.ctrlPtConfig = new ControlPtConfig(this.$el, opts);
-        opts.controlPoints = opts.controlPoints.map(function (p) {
-            p.color = tinycolor(p.color);
-            return p;
-        });
+				this.ctrlPtConfig = new ControlPtConfig(this.$el, opts);
+				opts.controlPoints = opts.controlPoints.map(function (p) {
+						p.color = tinycolor(p.color);
+						return p;
+				});
 		for (var i = 0; i < opts.controlPoints.length; ++i) {
 			var ctrlPt = this.createCtrlPt(opts.controlPoints[i]);
 			this.controlPoints.push(ctrlPt);
@@ -94,7 +94,7 @@
 		},
 
 		updatePreview: function () {
-            var result = [];
+			var result = [];
 			this.controlPoints.sort(ctrlPtComparator);
 			if (this.opts.orientation == "horizontal") {
 				var grad = this.g2d.createLinearGradient(0, 0, this.g2d.canvas.width, 0);
@@ -241,7 +241,7 @@
 		//color-chooser
 		this.$el = $('<div class="gradientPicker-ptConfig" style="visibility: hidden"></div>');
 		$parent.append(this.$el);
-		var $cpicker = $('<div class="color-chooser"></div>');
+		var $cpicker = $('<div class="color-chooser color-picker"></div>');
 		this.$el.append($cpicker);
 		var $rmEl = $("<div class='gradientPicker-close'></div>");
 		this.$el.append($rmEl);
@@ -267,15 +267,14 @@
 			this.visible = true;
 			this.listener = listener;
 			this.$el.css("visibility", "visible");
-
-            var cp = this.$cpicker.data("kendoSpectrumColorPicker");
-            color = tinycolor(color).toRgb();
+			var cp = this.$cpicker.data("kendoSpectrumColorPicker");
+			color = tinycolor(color).toRgb();
 			cp.value({
-                Red: color.r,
-                Green: color.g,
-                Blue: color.b,
-                Alpha: color.a,
-            });
+				Red: color.r,
+				Green: color.g,
+				Blue: color.b,
+				Alpha: color.a,
+			});
 
 			if (this.opts.orientation === "horizontal") {
 				this.$el.css("left", position.left);
