@@ -55,11 +55,11 @@
 
 		this.updatePreview = bind(this.updatePreview, this);
 		this.controlPoints = [];
-				this.ctrlPtConfig = new ControlPtConfig(this.$el, opts);
-				opts.controlPoints = opts.controlPoints.map(function (p) {
-						p.color = tinycolor(p.color);
-						return p;
-				});
+		this.ctrlPtConfig = new ControlPtConfig(this.$el, opts);
+		opts.controlPoints = opts.controlPoints.map(function (p) {
+				p.color = tinycolor(p.color);
+				return p;
+		});
 		for (var i = 0; i < opts.controlPoints.length; ++i) {
 			var ctrlPt = this.createCtrlPt(opts.controlPoints[i]);
 			this.controlPoints.push(ctrlPt);
