@@ -26,24 +26,6 @@
 		}
 	}
 
-	function hexToRgb(hex) {
-		// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-		hex = hex.replace(shorthandRegex, function (m, r, g, b) {
-			return r + r + g + g + b + b;
-		});
-
-		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		return result
-			? {
-				Red: parseInt(result[1], 16),
-				Green: parseInt(result[2], 16),
-				Blue: parseInt(result[3], 16),
-				Alpha: 1,
-			}
-			: null;
-	}
-
 	var browserPrefix = "";
 	var agent = window.navigator.userAgent;
 	if (agent.indexOf('WebKit') >= 0)
@@ -74,6 +56,10 @@
 		this.updatePreview = bind(this.updatePreview, this);
 		this.controlPoints = [];
 		this.ctrlPtConfig = new ControlPtConfig(this.$el, opts);
+		opts.controlPoints = opts.controlPoints.map(function (p) {
+				p.color = tinycolor(p.color);
+				return p;
+		});
 		for (var i = 0; i < opts.controlPoints.length; ++i) {
 			var ctrlPt = this.createCtrlPt(opts.controlPoints[i]);
 			this.controlPoints.push(ctrlPt);
@@ -114,10 +100,10 @@
 				var grad = this.g2d.createLinearGradient(0, 0, this.g2d.canvas.width, 0);
 				for (var i = 0; i < this.controlPoints.length; ++i) {
 					var pt = this.controlPoints[i];
-					grad.addColorStop(pt.position, pt.color);
+					grad.addColorStop(pt.position, pt.color.toRgbString());
 					result.push({
 						position: pt.position,
-						color: hexToRgb(pt.color)
+						color: pt.color
 					});
 				}
 			} else {
@@ -197,7 +183,7 @@
 		this.listener = listener;
 		this.outerWidth = this.$el.outerWidth();
 
-		this.$el.css("background-color", this.color);
+		this.$el.css("background-color", this.color.toRgbString());
 		if (orientation == "horizontal") {
 			var pxLeft = ($parentEl.width() - this.$el.outerWidth()) * (this.position);
 			this.$el.css("left", pxLeft);
@@ -241,7 +227,7 @@
 
 		colorChanged: function (c) {
 			this.color = c;
-			this.$el.css("background-color", this.color);
+			this.$el.css("background-color", this.color.toRgbString());
 			this.listener.updatePreview();
 		},
 
@@ -255,7 +241,7 @@
 		//color-chooser
 		this.$el = $('<div class="gradientPicker-ptConfig" style="visibility: hidden"></div>');
 		$parent.append(this.$el);
-		var $cpicker = $('<div class="color-chooser"></div>');
+		var $cpicker = $('<div class="color-chooser color-picker"></div>');
 		this.$el.append($cpicker);
 		var $rmEl = $("<div class='gradientPicker-close'></div>");
 		this.$el.append($rmEl);
@@ -264,9 +250,9 @@
 
 		this.colorChanged = bind(this.colorChanged, this);
 		var colorChangeHandler = e => {
-			this.colorChanged(e.value);
+			this.colorChanged(e);
 		};
-		$cpicker.kendoColorPicker({
+		$cpicker.kendoSpectrumColorPicker({
 			change: colorChangeHandler,
 		});
 		this.$cpicker = $cpicker;
@@ -281,9 +267,14 @@
 			this.visible = true;
 			this.listener = listener;
 			this.$el.css("visibility", "visible");
-
-			var cp = this.$cpicker.data("kendoColorPicker");
-			cp.value(color);
+			var cp = this.$cpicker.data("kendoSpectrumColorPicker");
+			color = tinycolor(color).toRgb();
+			cp.value({
+				Red: color.r,
+				Green: color.g,
+				Blue: color.b,
+				Alpha: color.a,
+			});
 
 			if (this.opts.orientation === "horizontal") {
 				this.$el.css("left", position.left);
@@ -303,8 +294,8 @@
 			}
 		},
 
-		colorChanged: function (hex) {
-			this.listener.colorChanged(hex);
+		colorChanged: function (color) {
+			this.listener.colorChanged(color);
 		},
 
 		removeClicked: function () {
