@@ -134,11 +134,11 @@
 			var y = e.pageY - offset.top;
 
 			var imgData = this.g2d.getImageData(x, y, 1, 1);
-			var colorStr = "rgb(" + imgData.data[0] + "," + imgData.data[1] + "," + imgData.data[2] + ")";
+			var color = tinycolor("rgb(" + imgData.data[0] + "," + imgData.data[1] + "," + imgData.data[2] + ")");
 
 			var cp = this.createCtrlPt({
 				position: x / this.g2d.canvas.width,
-				color: colorStr
+				color: color
 			});
 
 			this.controlPoints.push(cp);
